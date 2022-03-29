@@ -3,6 +3,7 @@ from psaw import PushshiftAPI
 import regex as re
 import pandas as pd
 from argparse import ArgumentParser
+import time
 
 def main():
     parser = ArgumentParser()
@@ -10,10 +11,12 @@ def main():
     parser.add_argument('-l', '--lim', help='Number of reddit data to collect', type=int, default = 50000)
     parser.add_argument('-f', '--filename', help='Name for file', type=str)
     opt = parser.parse_args()
-
+    startTime = time.time()
     data = get_data(opt.lim)
     print(len(data))
     data.to_csv(opt.dir + '/' + opt.filename)
+    executionTime = (time.time() - startTime)
+    print('Execution time in seconds: ' + str(executionTime))
 
 def get_gender(m_reg, f_reg, sentence):
   if bool(re.search(m_reg, sentence)):
