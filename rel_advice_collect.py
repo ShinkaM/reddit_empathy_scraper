@@ -19,6 +19,7 @@ def main():
     print('Execution time in seconds: ' + str(executionTime))
 
 def get_gender(m_reg, f_reg, sentence):
+  print('parsing ', sentence)
   if bool(re.search(m_reg, sentence)):
     return 'M'
   elif bool(re.search(f_reg, sentence)):
@@ -64,24 +65,24 @@ def get_data(lim):
     body = []
     for idx, row in df.iterrows():
         sub_id = row['id']
-        gender = get_gender(male_pattern, female_pattern, row['title'])
-        if gender:
-            # print(gender)
-            ids.append(sub_id)
-            genders.append(gender)
-            titles.append(row['title'])
-            body.append(row['selftext'])
-            usernames.append(row['author'])
-
-        else:
-            gender = get_gender(male_pattern, female_pattern, row['selftext'])
-            if gender:
-                # print(gender)
-                ids.append(sub_id)
-                genders.append(gender)
-                titles.append(row['title'])
-                body.append(row['selftext'])
-                usernames.append(row['author'])
+        if row['title']:
+          gender = get_gender(male_pattern, female_pattern, row['title'])
+          if gender:
+              # print(gender)
+              ids.append(sub_id)
+              genders.append(gender)
+              titles.append(row['title'])
+              body.append(row['selftext'])
+              usernames.append(row['author'])
+        elif row['selftext']:
+          gender = get_gender(male_pattern, female_pattern, row['selftext'])
+          if gender:
+              # print(gender)
+              ids.append(sub_id)
+              genders.append(gender)
+              titles.append(row['title'])
+              body.append(row['selftext'])
+              usernames.append(row['author'])
 
     df_user = pd.DataFrame(list(zip(ids, usernames, genders, titles, body)), columns = ['id', 'user', 'gender', 'title', 'body'])
     return df_user
