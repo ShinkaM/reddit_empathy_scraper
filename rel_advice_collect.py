@@ -19,7 +19,7 @@ def main():
     print('Execution time in seconds: ' + str(executionTime))
 
 def get_gender(m_reg, f_reg, sentence):
-  print('parsing ', sentence)
+  # print('parsing ', sentence)
   if bool(re.search(m_reg, sentence)):
     return 'M'
   elif bool(re.search(f_reg, sentence)):
