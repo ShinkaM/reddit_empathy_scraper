@@ -65,7 +65,7 @@ def get_data(lim):
     body = []
     for idx, row in df.iterrows():
         sub_id = row['id']
-        if row['title']:
+        if row['title'] and row['selftext']:
           gender = get_gender(male_pattern, female_pattern, row['title'])
           if gender:
               # print(gender)
@@ -74,9 +74,8 @@ def get_data(lim):
               titles.append(row['title'])
               body.append(row['selftext'])
               usernames.append(row['author'])
-        elif row['selftext']:
-          gender = get_gender(male_pattern, female_pattern, row['selftext'])
-          if gender:
+          else:
+              gender = get_gender(male_pattern, female_pattern, row['selftext'])
               # print(gender)
               ids.append(sub_id)
               genders.append(gender)
