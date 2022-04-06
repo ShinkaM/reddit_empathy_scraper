@@ -29,12 +29,12 @@ def main():
 def get_gender(sentence):
   # print('parsing ', sentence)
 
-  fem_iam = '(((i am|i\'m) (also )*(a|an)) (\w*\s)?((woman|gal|female|girl|mom|sister|sis)[\w\s]*|mother[.!?]|(mother )[\w\s]*))'
-  fem_as = '( (as) (a|an)) (\w*\s)?((woman|gal|female|girl|mom|sister|sis)[\w\s]*|mother[.!?]|(mother )[\w\s]*)'
+  fem_iam = '(((i am|i\'m|i was) (also )*(a|an)) (\w*\s)?((woman|gal|female|girl|mom|sister|sis)|mother[.!?]))'
+  fem_as = '((^as| as) (a|an)) (\w*\s)?((woman|gal|female|girl|mom|sister|sis)|mother[.!?,\s])'
   fem_ga = '(my|My|I|i|I\'m | me)\s?[\[|\(]([0-9][0-9](f)|(f)[0-9][0-9])[\]|\)]'
 
-  male_iam = '((i am|i\'m) (also )*(a|an)) (\w*\s)?((dude|guy|male|boy|father|dad|bro|brother)|man[?.!]|man (\w*\s)?)'
-  male_as = '( (as) (a|an)) (\w*\s)?((dude|guy|male|boy|father|dad|bro|brother)|man[?.!]|(man[\s,])[\w\s]*)'
+  male_iam = '((i am|i\'m|i was) (also )*(a|an)) (\w*\s)?((dude|guy|male|boy|father|dad|bro|brother)|man[?.!\s])'
+  male_as = '((^as| as) (a|an)) (\w*\s)?((dude|guy|male|boy|father|dad|bro|brother)|man[?.!,\s])'
   male_ga = '(my|My|I|i|I\'m | me)\s?[\[|\(]([0-9][0-9](m)|(m)[0-9][0-9])[\]|\)]'
   female_pattern = re.compile("(%s|%s|%s)" % (fem_iam, fem_as, fem_ga), re.IGNORECASE)
   male_pattern = re.compile("(%s|%s|%s)" % (male_iam, male_as, male_ga), re.IGNORECASE)
