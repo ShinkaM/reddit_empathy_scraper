@@ -4,27 +4,26 @@ import regex as re
 import pandas as pd
 from argparse import ArgumentParser
 import time
+
 import logging
+import sys
 
 def main():
     parser = ArgumentParser()
     parser.add_argument('-d', '--dir', help='Dirctory to save data', type=str)
     parser.add_argument('-l', '--lim', help='Number of reddit data to collect', type=int, default = 50000)
+    parser.add_argument('-f', '--filename', help='Name for file', type=str)
     parser.add_argument('-s', '--subreddit', help='Name of sub to collect from', type=str, default='relationship_advice')
     parser.add_argument('-t', '--type', help='type of data to collect', type=str)
     
 
     opt = parser.parse_args()
-    logging.basicConfig(filename='log/' + opt.subreddit + '.log', encoding='utf-8', level=logging.DEBUG, filemode='w',)
-
     startTime = time.time()
-    logging.info('Collecting ' + str(opt.lim) + ' lines from ' + opt.subreddit)
-    data = get_data(opt.lim, opt.subreddit, opt.type, logging)
-
-    logging.info('total filtered: ' + str(len(data)))
-    data.to_csv(opt.dir + '/' + 'data_' + str(opt.lim) + '_' + opt.subreddit + '.csv')
+    data = get_data(opt.lim, opt.subreddit, opt.type)
+    print('total data filtered: ', len(data))
+    data.to_csv(opt.dir + '/' + opt.filename)
     executionTime = (time.time() - startTime)
-    logging.info('Execution time in seconds: ' + str(executionTime))
+    print('Execution time in seconds: ' + str(executionTime))
 
 def get_gender(sentence):
   # print('parsing ', sentence)
@@ -61,56 +60,38 @@ def get_age(sentence):
     age = match_2.groups()[1]
   return int(age)
 
-def get_data(lim, sub, type, logging):
+def get_data(lim, sub, type):
 
     api = PushshiftAPI()
 
     # lim = 50000
 
-    query = (api.search_submissions(
-                                subreddit=sub,
-                                filter=['id','author', 'title', 'selftext'],
-                                limit=lim))
-
-    submissions = list()
-    for element in query:
-        submissions.append(element.d_)
-    # print("total data collected: ", len(submissions))
-    logging.info("total data collected: "+ str(len(submissions)))
-    df = pd.DataFrame(submissions)
-  
+    query = list(api.search_comments(subreddit = sub,
+                                            filter=['id','parent_id','permalink','author', 'title', 
+                                                    'subreddit','body','num_comments','score'],
+                                            limit=lim
+                                          ))
+    df = pd.DataFrame(query)
+    print('total data collected: ', len(df))
     if type == 'gender':
 
       ids = []
-      titles = []
       genders = []
       ages = []
-      # comments = []
       usernames = []
       body = []
+      debug = []
       for idx, row in df.iterrows():
-          logging.info(idx)
           sub_id = row['id']
-          if isinstance(row['title'], str) and isinstance(row['selftext'], str):
-            gender = get_gender(row['title'])
-            if gender:
-                # print(gender)
+          if isinstance(row['body'], str):
+              gender = get_gender(row['body'])
+              if gender:
                 ids.append(sub_id)
                 genders.append(gender)
-                titles.append(row['title'])
-                body.append(row['selftext'])
+                body.append(row['body'])
                 usernames.append(row['author'])
-            else:
-                gender = get_gender(row['selftext'])
-                if gender:
-                # print(gender)
-                  ids.append(sub_id)
-                  genders.append(gender)
-                  titles.append(row['title'])
-                  body.append(row['selftext'])
-                  usernames.append(row['author'])
-
-      df_user = pd.DataFrame(list(zip(ids, usernames, genders, titles, body)), columns = ['id', 'user', 'gender', 'title', 'body'])
+      # print(df['id'], 'ferfe', len(df))
+      df_user = pd.DataFrame(list(zip(ids, usernames, genders, body)), columns = ['id', 'user', 'gender', 'body'])
       return df_user
 
     elif type == 'age':
