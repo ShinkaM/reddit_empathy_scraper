@@ -8,7 +8,7 @@ import time
 import logging
 from argparse import ArgumentParser
 from prawcore.exceptions import Forbidden, NotFound
-
+import pathlib
 def main():
     parser = ArgumentParser()
     parser.add_argument('-c', '--category', help='Category of data', type=str)
@@ -32,6 +32,7 @@ def get_data(category):
     comment_path = datadir + 'comments/'
 
     submissions_csv_path = category + '-submissions.csv'
+    pathlib.Path(comment_path).mkdir(parents=True, exist_ok=True) 
 
     submissions_data_dict = {}
     for row in df.itertuples():
